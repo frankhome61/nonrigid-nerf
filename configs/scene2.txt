@@ -1,7 +1,7 @@
 dataset_type = llff
 datadir = data/scene2/
 
-rootdir = experiments/
+rootdir = /sharedvol1/users/frank/nonrigid-nerf/experiments/
 expname =  experiment_scene2
 
 debug = False
