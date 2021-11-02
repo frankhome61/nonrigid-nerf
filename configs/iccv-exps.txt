@@ -1,7 +1,7 @@
 dataset_type = llff
 datadir = data/iccv-exps/
 
-rootdir = experiments/
+rootdir = /sharedvol1/users/frank/nonrigid-nerf/experiments/
 expname =  experiment_iccv_exp
 
 debug = False
@@ -19,9 +19,9 @@ approx_nonrigid_viewdirs = True
 time_conditioned_baseline = False
 
 lrate_decay = 250000
-N_iters = 20000
-i_video = 20000
-i_testset = 20000
+N_iters = 20
+i_video = 20
+i_testset = 20
 
 N_samples = 64
 N_importance = 64
