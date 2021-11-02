@@ -448,7 +448,7 @@ def render_path(
     rgbs = []
     disps = []
     all_details_and_rest = []
-
+    print("render_pose shape within render_path", render_poses.shape)
     t = time.time()
     for i, (c2w, intrin) in enumerate(tqdm(zip(render_poses, intrinsics))):
         print(i, time.time() - t)
@@ -1342,6 +1342,7 @@ def main_function(args):
             bd_factor=args.bd_factor,
             spherify=args.spherify,
         )
+        print("Render pose shape ", render_poses.shape)
         dataset_extras = _get_multi_view_helper_mappings(images.shape[0], args.datadir)
         intrinsics, image_folder = get_full_resolution_intrinsics(args, dataset_extras)
         
@@ -1372,8 +1373,10 @@ def main_function(args):
             intrinsics[viewid] = new_entry
 
         # take out chunks (args parameters: train & test block lengths)
-        i_test = []  # [i_test]
+
+        i_test = [i_test]
         if args.test_block_size > 0 and args.train_block_size > 0:
+            i_test = []
             print(
                 "splitting timesteps into training ("
                 + str(args.train_block_size)
@@ -1396,6 +1399,7 @@ def main_function(args):
                     )
                 ]
             )
+            print("dataset extras", dataset_extras)
             i_test = [
                 imageid
                 for imageid, timestep in enumerate(
@@ -1707,6 +1711,7 @@ def main_function(args):
         if i % args.i_video == 0 and i > 0:
             # Turn on testing mode
             print("rendering test set...", flush=True)
+            print("render pose length: {}, i_test tlength: {}, datataset_eextra: {}", len(render_poses), len(i_test), dataset_extras["is_multiview"])
             if len(render_poses) > 0 and len(i_test) > 0 and not dataset_extras["is_multiview"]:
                 with torch.no_grad():
                     if args.render_test:
@@ -1737,6 +1742,7 @@ def main_function(args):
                     imageio.mimwrite(
                         moviebase + "rgb.mp4", to8b(rgbs), fps=30, quality=8
                     )
+                    print("mp4 written at ", moviebase)
                     imageio.mimwrite(
                         moviebase + "disp.mp4",
                         to8b(disps / np.max(disps)),
@@ -1796,6 +1802,7 @@ def main_function(args):
                         ],
                         parallelized_render_function=parallel_render,
                     )
+                    print("training set rgb: ", rgbs.shape)
                 print("Done, saving", rgbs.shape, disps.shape)
                 moviebase = os.path.join(
                     logdir, "{}_training_{:06d}_".format(expname, i)
@@ -2002,6 +2009,7 @@ def backup(results_folder):
 
 
 if __name__ == "__main__":
+    os.system("pip install --upgrade imageio-ffmpeg")
     parser = config_parser()
     args = parser.parse_args()
 
