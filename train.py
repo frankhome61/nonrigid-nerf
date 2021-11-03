@@ -16,7 +16,7 @@ from tqdm import tqdm, trange
 import matplotlib.pyplot as plt
 
 from run_nerf_helpers import *
-#from load_llff import load_llff_data_multi_view
+from load_llff import load_llff_data_multi_view
 from load_llff import load_llff_data
 
 
@@ -1274,7 +1274,7 @@ def get_full_resolution_intrinsics(args, dataset_extras):
     if dataset_extras["is_multiview"]: # multi-view
         image_folder = "images"
         import json
-        with open(os.path.join(args.datadir, "calibration_averaged_camera_view.json"), "r") as json_file:
+        with open(os.path.join(args.datadir, "calibration.json"), "r") as json_file:
             calibration = json.load(json_file)
 
         for raw_view in calibration.keys():
@@ -1332,10 +1332,10 @@ def main_function(args):
         np.random.seed(args.seed)
 
     # Load data
-
+    print("downsample factor: ", args.factor)
     if args.dataset_type == "llff":
-        #images, poses, bds, render_poses, i_test = load_llff_data_multi_view(
-        images, poses, bds, render_poses, i_test = load_llff_data(
+        images, poses, bds, render_poses, i_test = load_llff_data_multi_view(
+        #images, poses, bds, render_poses, i_test = load_llff_data(
             args.datadir,
             factor=args.factor,
             recenter=True,

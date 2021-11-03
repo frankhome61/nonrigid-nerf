@@ -41,8 +41,7 @@ def load_llff_data_multi_view(datadir, factor, recenter, bd_factor, spherify):
         np.stack(
             [
                 imageio.imread(
-                    os.path.join(datadir, "images", image),
-                    ignoregamma=True,
+                    os.path.join(datadir, "images", image)
                 )
                 for image in images
             ],
