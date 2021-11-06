@@ -2009,7 +2009,6 @@ def backup(results_folder):
 
 
 if __name__ == "__main__":
-    os.system("pip install --upgrade imageio-ffmpeg")
     parser = config_parser()
     args = parser.parse_args()
 
