@@ -418,8 +418,8 @@ def create_folder(folder):
 def free_viewpoint_rendering(args):
 
     # memory vs. speed and quality
-    frames_at_a_time = 10 # set to 1 to reduce memory requirements
-    only_rgb = False # set to True to reduce memory requirements. Needs to be False for some scene editing to work.
+    frames_at_a_time = 5 # set to 1 to reduce memory requirements
+    only_rgb = True # set to True to reduce memory requirements. Needs to be False for some scene editing to work.
 
     # determine output name
     if args.camera_path == "spiral":
