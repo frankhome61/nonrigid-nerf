@@ -414,6 +414,66 @@ def _setup_nonrigid_nerf_network(results_folder, checkpoint="latest"):
 def create_folder(folder):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
+def normalize(x):
+    return x / np.linalg.norm(x)
+
+def viewmatrix(z, up, pos):
+    vec2 = normalize(z)
+    vec1_avg = up
+    vec0 = normalize(np.cross(vec1_avg, vec2))
+    vec1 = normalize(np.cross(vec2, vec0))
+    m = np.stack([vec0, vec1, vec2, pos], 1)
+    return m
+
+def render_path_spiral(c2w, up, rads, focal, zdelta, zrate, rots, N):
+    render_poses = []
+    rads = np.array(list(rads) + [1.])
+    hwf = c2w[:,4:5]
+    
+    for theta in np.linspace(0., 2. * np.pi * rots, N+1)[:-1]:
+        c = np.dot(c2w[:3,:4], np.array([np.cos(theta), -np.sin(theta), -np.sin(theta*zrate), 1.]) * rads) 
+        z = normalize(c - np.dot(c2w[:3,:4], np.array([0,0,-focal, 1.])))
+        render_poses.append(np.concatenate([viewmatrix(z, up, c), hwf], 1))
+    return render_poses
+
+def poses_avg(poses):
+
+    hwf = poses[0, :3, -1:]
+
+    center = poses[:, :3, 3].mean(0)
+    vec2 = normalize(poses[:, :3, 2].sum(0))
+    up = poses[:, :3, 1].sum(0)
+    c2w = np.concatenate([viewmatrix(vec2, up, center), hwf], 1)
+    
+    return c2w
+
+def _spiral_poses(poses, bds, num_poses):
+    c2w = poses_avg(poses)
+    print('recentered', c2w.shape)
+    print(c2w[:3,:4])
+
+    ## Get spiral
+    # Get average pose
+    up = normalize(poses[:, :3, 1].sum(0))
+
+    # Find a reasonable "focus depth" for this dataset
+    close_depth, inf_depth = bds.min()*.9, bds.max()*5.
+    dt = .75
+    mean_dz = 1./(((1.-dt)/close_depth + dt/inf_depth))
+    focal = mean_dz
+
+    # Get radii for spiral path
+    shrink_factor = .8
+    zdelta = close_depth * .2
+    tt = poses[:,:3,3] # ptstocam(poses[:3,3,:].T, c2w).T
+    rads = np.percentile(np.abs(tt), 90, 0)
+    c2w_path = c2w
+    N_views = 120
+    N_rots = 2
+
+    render_poses = render_path_spiral(c2w_path, up, rads, focal, zdelta, zrate=.5, rots=N_rots, N=N_views)
+    return render_poses
+
 
 def free_viewpoint_rendering(args):
 
@@ -529,12 +589,8 @@ def free_viewpoint_rendering(args):
         )  # N x 3 x 4
         intrinsics = [ intrinsics[dataset_extras["imageid_to_viewid"][args.fixed_view]] for _ in range(num_poses) ]
     elif args.camera_path == "spiral":
-        # poses = np.stack(_spiral_poses(poses, bds, num_poses), axis=0)
-        poses = []
-        print("Spiral render poses shape", render_poses.shape)
-        while len(poses) < num_poses:
-            poses += [render_pose for render_pose in render_poses]
-        poses = np.stack(poses, axis=0)[:num_poses]
+        poses = np.stack(_spiral_poses(poses, bds, num_poses), axis=0)
+        print("Render poses shape: ###", poses.shape)
         intrinsics = [ intrinsics[dataset_extras["imageid_to_viewid"][0]] for _ in range(num_poses) ]
     else:
         # poses has shape N x ... and ray_bending_latents has shape N x ...
