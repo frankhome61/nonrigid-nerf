@@ -95,7 +95,7 @@ def _setup_nonrigid_nerf_network(results_folder, checkpoint="latest"):
             bd_factor=bd_factor,
             spherify=spherify,
         )
-        extras = _get_multi_view_helper_mappings(images.shape[0], datatdir)
+        extras = _get_multi_view_helper_mappings(images.shape[0], datadir)
 
         # poses
         hwf = poses[0, :3, -1]
@@ -531,6 +531,7 @@ def free_viewpoint_rendering(args):
     elif args.camera_path == "spiral":
         # poses = np.stack(_spiral_poses(poses, bds, num_poses), axis=0)
         poses = []
+        print("Spiral render poses shape", render_poses.shape)
         while len(poses) < num_poses:
             poses += [render_pose for render_pose in render_poses]
         poses = np.stack(poses, axis=0)[:num_poses]
