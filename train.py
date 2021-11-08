@@ -1371,7 +1371,7 @@ def main_function(args):
             intrinsics[viewid] = new_entry
 
         # take out chunks (args parameters: train & test block lengths)
-        i_test = []  # [i_test]
+        i_test = [i_test]  # [i_test]
         if args.test_block_size > 0 and args.train_block_size > 0:
             print(
                 "splitting timesteps into training ("
