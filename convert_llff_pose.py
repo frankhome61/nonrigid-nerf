@@ -217,7 +217,7 @@ def load_llff_data(basedir, factor=8, recenter=True, bd_factor=.75, spherify=Fal
 ########### RUNNER SCRIPTS ###############
 
 base_path = "/home/guowei/Research/View-Synthesis-Current-Works/nonrigid_nerf/data"
-scene_name = "iccv-03-two-view"
+scene_name = "synthetic-00-two-view"
 
 poses, bds, render_poses, i_test = load_llff_data(
 	basedir=os.path.join(base_path, scene_name),
