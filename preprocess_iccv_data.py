@@ -3,9 +3,9 @@ import glob
 import shutil
 
 base_dir = "/home/guowei/Research/View-Synthesis-Current-Works/nonrigid_nerf/data"
-scene_name = "synthetic_scene_00"
+scene_name = "synthetic_scene_01"
 
-output_name= "synthetic-00-two-view"
+output_name= "synthetic-01-two-view"
 
 # create target directory
 output_dir = os.path.join(base_dir, output_name)
