@@ -217,7 +217,7 @@ def load_llff_data(basedir, factor=8, recenter=True, bd_factor=.75, spherify=Fal
 ########### RUNNER SCRIPTS ###############
 
 base_path = "/home/guowei/Research/View-Synthesis-Current-Works/nonrigid_nerf/data"
-scene_name = "iccv-01-full"
+scene_name = "iccv-01-two-view"
 
 poses, bds, render_poses, i_test = load_llff_data(
 	basedir=os.path.join(base_path, scene_name),
@@ -235,7 +235,9 @@ calibration_dict = {}
 calibration_dict['min_bound'] = float(bds.min())
 calibration_dict['max_bound'] = float(bds.max())
 
-for idx, pose in enumerate(poses):
+cams = [4, 5]
+
+for idx, pose in enumerate(poses[cams[0]:cams[1]+1]):
 	per_cam_calibration = {}
 
 	rotation = pose[:,:3]
@@ -250,7 +252,7 @@ for idx, pose in enumerate(poses):
 	per_cam_calibration['focal_y'] = float(f)
 	per_cam_calibration['height'] = float(h)
 	per_cam_calibration['width'] = float(w) 
-	calibration_dict[str(idx)] = per_cam_calibration
+	calibration_dict[str(cams[0] + idx)] = per_cam_calibration
 
 calibration_dict['i_test'] = int(i_test)
 with open(os.path.join(base_path, scene_name, "calibration.json"), "w") as json_file:
@@ -261,13 +263,14 @@ np.save(os.path.join(base_path, scene_name, "render_poses.npy"), render_poses)
 images_path = os.path.join(base_path, scene_name, "images", "*.jpg")
 images = glob.glob(images_path)
 
-num_cams = 10
+
+num_cams = len(cams)
 num_frames = len(images) // num_cams
 
 image_to_camera_id_and_timestep = {}
 
 for i in range(num_frames):
-	for idx in range(num_cams):
+	for idx in cams:
 		image_name = "{}{:04d}.jpg".format(idx, i)
 		image_to_camera_id_and_timestep[image_name] = [str(idx), i]
 
