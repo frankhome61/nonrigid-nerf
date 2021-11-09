@@ -621,8 +621,8 @@ def free_viewpoint_rendering(args):
         )  # N x 3 x 4
         intrinsics = [ intrinsics[dataset_extras["imageid_to_viewid"][fixed_camera]] for _ in range(num_target_frames) ]
         
-    latents = ray_bending_latents
-
+    latents = ray_bending_latents 
+ 
     latents = latents.detach().cuda()
 
     # rendering
@@ -631,7 +631,7 @@ def free_viewpoint_rendering(args):
     rgbs = []
     disps = []
 
-    num_output_frames = 5#poses.shape[0]
+    num_output_frames = poses.shape[0]
     for start_index in range(0, num_output_frames, frames_at_a_time):
 
         end_index = np.min([start_index + frames_at_a_time, num_output_frames])

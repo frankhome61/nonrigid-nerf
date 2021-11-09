@@ -2,6 +2,7 @@ import numpy as np
 import json
 import os 
 import imageio
+import glob
     
 def _load_data(basedir, factor=None, width=None, height=None, load_imgs=True):
     
@@ -9,6 +10,7 @@ def _load_data(basedir, factor=None, width=None, height=None, load_imgs=True):
     poses = poses_arr[:, :-2].reshape([-1, 3, 5]).transpose([1,2,0])
     bds = poses_arr[:, -2:].transpose([1,0])
     
+    print("path: ", os.path.join(basedir, 'images'))
     img0 = [os.path.join(basedir, 'images', f) for f in sorted(os.listdir(os.path.join(basedir, 'images'))) \
             if f.endswith('JPG') or f.endswith('jpg') or f.endswith('png')][0]
     sh = imageio.imread(img0).shape
@@ -214,9 +216,8 @@ def load_llff_data(basedir, factor=8, recenter=True, bd_factor=.75, spherify=Fal
 
 ########### RUNNER SCRIPTS ###############
 
-
 base_path = "/home/guowei/Research/View-Synthesis-Current-Works/nonrigid_nerf/data"
-scene_name = "iccv-01"
+scene_name = "iccv-01-full"
 
 poses, bds, render_poses, i_test = load_llff_data(
 	basedir=os.path.join(base_path, scene_name),
@@ -257,14 +258,17 @@ with open(os.path.join(base_path, scene_name, "calibration.json"), "w") as json_
 
 np.save(os.path.join(base_path, scene_name, "render_poses.npy"), render_poses)
 
+images_path = os.path.join(base_path, scene_name, "images", "*.jpg")
+images = glob.glob(images_path)
 
-num_frames = 5
 num_cams = 10
+num_frames = len(images) // num_cams
+
 image_to_camera_id_and_timestep = {}
 
 for i in range(num_frames):
 	for idx in range(num_cams):
-		image_name = "{}0000{}.jpg".format(idx, i)
+		image_name = "{}{:04d}.jpg".format(idx, i)
 		image_to_camera_id_and_timestep[image_name] = [str(idx), i]
 
 with open(os.path.join(base_path, scene_name, "image_to_camera_id_and_timestep.json"), "w") as json_file:
