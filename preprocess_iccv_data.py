@@ -3,9 +3,9 @@ import glob
 import shutil
 
 base_dir = "/home/guowei/Research/View-Synthesis-Current-Works/nonrigid_nerf/data"
-scene_name = "scene006"
+scene_name = "scene026"
 
-output_name= "iccv-01-two-view"
+output_name= "iccv-03-two-view"
 
 # create target directory
 output_dir = os.path.join(base_dir, output_name)
@@ -22,7 +22,7 @@ shutil.copy2(
 # copy and organize image files 
 cams = [4,5]
 num_cams = len(cams)
-frame_range = [0, 60]
+frame_range = [360, 420]
 
 for i in cams:
 	cam_img_path = os.path.join(base_dir, scene_name, "cam0{}".format(i), "*.jpg")
