@@ -589,7 +589,9 @@ def free_viewpoint_rendering(args):
         )  # N x 3 x 4
         intrinsics = [ intrinsics[dataset_extras["imageid_to_viewid"][args.fixed_view]] for _ in range(num_poses) ]
     elif args.camera_path == "spiral":
-        poses = np.stack(_spiral_poses(poses, bds, num_poses), axis=0)
+        #poses = np.stack(_spiral_poses(poses, bds, num_poses), axis=0)
+        poses = render_poses
+        print("render pose shape: ", poses.shape)
         # poses = []
         # while len(poses) < num_poses:
         #     poses += [render_pose for render_pose in render_poses]
@@ -646,7 +648,7 @@ def free_viewpoint_rendering(args):
         )
 
         subposes = poses[start_index:end_index]
-        sublatents = [latents[i] for i in range(start_index, end_index)]
+        sublatents = [latents[i % 60] for i in range(start_index, end_index)]
 
         # render
         returned = render_convenient(
