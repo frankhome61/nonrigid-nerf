@@ -159,6 +159,7 @@ def load_llff_data(basedir, factor=8, recenter=True, bd_factor=.75, spherify=Fal
     
     # Rescale if bd_factor is provided
     sc = 1./(bds.max() - bds.min())
+    #sc = 1. if bd_factor is None else 1./(np.percentile(bds[:, 0], 5) * bd_factor)
     poses[:,:3,3] *= sc
     bds *= sc
     
@@ -242,6 +243,7 @@ for idx, pose in enumerate(poses[cams[0]:cams[1]+1]):
 
 	rotation = pose[:,:3]
 	translation = pose[:,3]
+	print(translation)
 	h, w, f = pose[:,-1]
 
 	per_cam_calibration['translation'] = translation.tolist()
